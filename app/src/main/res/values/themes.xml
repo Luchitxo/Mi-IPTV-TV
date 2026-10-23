@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Color de fondo raíz nativo igual al DeepSlateBlack (#0B0F19) para prevenir el destello gris al arrancar -->
+    <color name="deep_slate_black">#0B0F19</color>
+
+    <!-- Usando el tema nativo del framework Material sin depender de AppCompat -->
+    <style name="Theme.MiIPTVVODTV" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/deep_slate_black</item>
+        <item name="android:colorBackground">@color/deep_slate_black</item>
+    </style>
+</resources>

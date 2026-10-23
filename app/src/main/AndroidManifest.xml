@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Permisos necesarios para streaming y conectividad de red -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Declaraciones para Android TV (Leanback launcher) -->
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+
+    <application
+        android:name=".MainApplication"
+        android:allowBackup="false"
+        android:hardwareAccelerated="true"
+        android:icon="@mipmap/ic_launcher"
+        android:banner="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
+        android:theme="@style/Theme.MiIPTVVODTV">
+
+        <!--
+            DOCUMENTACIÓN DE ATRIBUTOS DEL MANIFEST:
+            - android:allowBackup="false": Evita que el servicio de backup de Google restaure automáticamente
+              una versión obsoleta del archivo de caché local (media_cache_v2.json) en nuevas instalaciones.
+            - android:usesCleartextTraffic="true": Imprescindible para IPTV en vivo, ya que muchos servidores
+              y hosts emisores de terceros emiten mediante flujos HTTP sin cifrado TLS (http://).
+            - android:banner="@mipmap/ic_launcher": Requerido por la interfaz de Android TV Leanback.
+            - android:theme="@style/Theme.MiIPTVVODTV": Tema propio que asigna windowBackground = #0B0F19
+              (DeepSlateBlack) evitando destellos grises al arrancar la ventana nativa antes de renderizar Compose.
+        -->
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|smallestScreenSize|uiMode"
+            android:theme="@style/Theme.MiIPTVVODTV">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MiIPTVVODTV</string>
+    <string name="filter_all">Todas</string>
+    <string name="filter_favorites">Favoritos</string>
+    <string name="offline_mode">Modo Offline (Lista Guardada)</string>
+    <string name="no_channels">No hay canales disponibles en esta categoría.</string>
+    <string name="app_title">Mi IPTV TV</string>
+</resources>
