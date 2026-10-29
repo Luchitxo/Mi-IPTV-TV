@@ -13,6 +13,9 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.util.concurrent.TimeUnit
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 data class FetchResult(
     val data: MediaResponse,
@@ -39,7 +42,6 @@ class MediaRepository(private val context: Context) {
                 val wrapper = gson.fromJson(jsonString, CachedMediaWrapper::class.java)
                 wrapper?.data
             } else {
-                // Fallback a antiguo SharedPreferences por si acaso el usuario ya tenía datos ahí
                 val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                 val oldJson = prefs.getString(KEY_CACHE_JSON, null)
                 if (!oldJson.isNullOrEmpty()) {
@@ -55,15 +57,51 @@ class MediaRepository(private val context: Context) {
         }
     }
 
-    // Refrescar contenido desde la red (GitHub) y actualizar archivo de caché con timestamp
+    // Refrescar contenido desde la red (Soporta tanto JSON como listas M3U/M3U8 con M3UParser)
     suspend fun fetchAndSaveRemoteContent(
         onProgress: (percent: Int, status: String) -> Unit = { _, _ -> }
     ): MediaResponse = withContext(Dispatchers.IO) {
         onProgress(10, "Actualizando desde la nube...")
-        val api = ApiService.instance
-        val response = api.getContent()
 
-        val rawChannels = response.channels ?: emptyList()
+        val rawText = try {
+            val client = OkHttpClient.Builder()
+                .connectTimeout(20, TimeUnit.SECONDS)
+                .readTimeout(20, TimeUnit.SECONDS)
+                .build()
+            val request = Request.Builder()
+                .url("https://raw.githubusercontent.com/Luchitxo/listas-iptv/refs/heads/main/tv_vod.json")
+                .build()
+            client.newCall(request).execute().use { response ->
+                response.body?.string() ?: ""
+            }
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            Log.e(TAG, "Error descargando contenido crudo, intentando fallback Retrofit", e)
+            val retrofitRes = ApiService.instance.getContent()
+            return@withContext processMediaResponse(retrofitRes, onProgress)
+        }
+
+        val channels = if (rawText.trim().startsWith("#EXTM3U", ignoreCase = true) || rawText.contains("#EXTINF:")) {
+            M3UParser.parse(rawText)
+        } else {
+            val resp = gson.fromJson(rawText, MediaResponse::class.java)
+            resp?.channels ?: emptyList()
+        }
+
+        processChannels(channels, onProgress)
+    }
+
+    private fun processMediaResponse(
+        response: MediaResponse,
+        onProgress: (percent: Int, status: String) -> Unit
+    ): MediaResponse {
+        return processChannels(response.channels ?: emptyList(), onProgress)
+    }
+
+    private fun processChannels(
+        rawChannels: List<Channel>,
+        onProgress: (percent: Int, status: String) -> Unit
+    ): MediaResponse {
         if (rawChannels.isEmpty()) {
             throw IllegalStateException("El servidor devolvió una lista vacía de canales.")
         }
@@ -95,7 +133,7 @@ class MediaRepository(private val context: Context) {
         preloadImages(validChannels, getFavorites())
 
         onProgress(100, "¡Actualizado con éxito!")
-        sanitizedResponse
+        return sanitizedResponse
     }
 
     // Método combinado para compatibilidad (Stale-While-Revalidate)
@@ -147,7 +185,6 @@ class MediaRepository(private val context: Context) {
         return currentFavorites
     }
 
-    // Tarea 1: Métodos de gestión de URL preferida por canal en SharedPreferences
     fun getPreferredUrl(channelId: String): String? {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return prefs.getString("preferred_url_$channelId", null)

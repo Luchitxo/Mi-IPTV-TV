@@ -1,0 +1,1953 @@
+================================================================================
+INVENTARIO COMPLETO DE CÓDIGO FUENTE - MI IPTV VOD TV (VERSIÓN 100% ÍNTEGRA)
+================================================================================
+
+--------------------------------------------------------------------------------
+[1] Ruta: app/src/main/AndroidManifest.xml
+--------------------------------------------------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Permisos necesarios para streaming y conectividad de red -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Declaraciones para Android TV (Leanback launcher) -->
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+
+    <application
+        android:name=".MainApplication"
+        android:allowBackup="false"
+        android:hardwareAccelerated="true"
+        android:icon="@mipmap/ic_launcher"
+        android:banner="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
+        android:theme="@style/Theme.MiIPTVVODTV">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|smallestScreenSize|uiMode"
+            android:theme="@style/Theme.MiIPTVVODTV">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
+
+--------------------------------------------------------------------------------
+[2] Ruta: app/build.gradle.kts
+--------------------------------------------------------------------------------
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+}
+
+android {
+    namespace = "com.example.miiptvvodtv"
+    compileSdk = 34
+
+    defaultConfig {
+        applicationId = "com.example.miiptvvodtv"
+        minSdk = 21
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0"
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+        debug {
+            isMinifyEnabled = false
+        }
+    }
+
+    buildFeatures {
+        compose = true
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+dependencies {
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation("androidx.compose.material3:material3")
+    implementation(libs.androidx.tv.material)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.exoplayer.hls)
+    implementation(libs.media3.exoplayer.dash)
+    implementation(libs.media3.ui)
+    implementation(libs.coil.compose)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+}
+
+--------------------------------------------------------------------------------
+[3] Ruta: build.gradle.kts (Raíz)
+--------------------------------------------------------------------------------
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+plugins {
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.compose) apply false
+}
+
+--------------------------------------------------------------------------------
+[4] Ruta: settings.gradle.kts
+--------------------------------------------------------------------------------
+pluginManagement {
+    repositories {
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "MiIPTVVODTV"
+include(":app")
+
+--------------------------------------------------------------------------------
+[5] Ruta: gradle.properties
+--------------------------------------------------------------------------------
+org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+org.gradle.configuration-cache=false
+kotlin.code.style=official
+android.useAndroidX=true
+
+--------------------------------------------------------------------------------
+[6] Ruta: gradle/libs.versions.toml
+--------------------------------------------------------------------------------
+[versions]
+agp = "8.13.2"
+coreKtx = "1.12.0"
+kotlin = "2.2.10"
+composeBom = "2024.10.01"
+tvMaterial = "1.0.0"
+lifecycleRuntimeKtx = "2.7.0"
+activityCompose = "1.8.2"
+media3 = "1.4.1"
+coil = "2.7.0"
+retrofit = "2.9.0"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-tv-material = { group = "androidx.tv", name = "tv-material", version.ref = "tvMaterial" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+
+media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3" }
+media3-exoplayer-hls = { group = "androidx.media3", name = "media3-exoplayer-hls", version.ref = "media3" }
+media3-exoplayer-dash = { group = "androidx.media3", name = "media3-exoplayer-dash", version.ref = "media3" }
+media3-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "media3" }
+
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+
+--------------------------------------------------------------------------------
+[7] Ruta: app/proguard-rules.pro
+--------------------------------------------------------------------------------
+-keep class com.example.miiptvvodtv.** { *; }
+
+-keepattributes Signature, InnerClasses, EnclosingMethod
+-keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
+-keepclassmembers interface * { @retrofit2.http.* <methods>; }
+-dontwarn okhttp3.**
+-dontwarn retrofit2.**
+-dontwarn okio.**
+
+-keepnames class kotlinx.coroutines.** { *; }
+
+-dontwarn androidx.media3.**
+-keep class androidx.media3.** { *; }
+
+--------------------------------------------------------------------------------
+[8] Ruta: app/src/main/res/values/strings.xml
+--------------------------------------------------------------------------------
+<resources>
+    <string name="app_name">MiIPTVVODTV</string>
+    <string name="filter_all">Todas</string>
+    <string name="filter_favorites">Favoritos</string>
+    <string name="offline_mode">Modo Offline (Lista Guardada)</string>
+    <string name="no_channels">No hay canales disponibles en esta categoría.</string>
+    <string name="app_title">Mi IPTV TV</string>
+</resources>
+
+--------------------------------------------------------------------------------
+[9] Ruta: app/src/main/res/values/themes.xml
+--------------------------------------------------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="deep_slate_black">#0B0F19</color>
+
+    <style name="Theme.MiIPTVVODTV" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/deep_slate_black</item>
+        <item name="android:colorBackground">@color/deep_slate_black</item>
+    </style>
+</resources>
+
+--------------------------------------------------------------------------------
+[10] Ruta: app/src/main/java/com/example/miiptvvodtv/MainApplication.kt
+--------------------------------------------------------------------------------
+package com.example.miiptvvodtv
+
+import android.app.Application
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
+
+class MainApplication : Application(), ImageLoaderFactory {
+
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this)
+            .memoryCache {
+                MemoryCache.Builder(this)
+                    .maxSizePercent(0.30)
+                    .build()
+            }
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(cacheDir.resolve("image_cache"))
+                    .maxSizeBytes(150 * 1024 * 1024)
+                    .build()
+            }
+            .respectCacheHeaders(false)
+            .allowHardware(true)
+            .build()
+    }
+}
+
+--------------------------------------------------------------------------------
+[11] Ruta: app/src/main/java/com/example/miiptvvodtv/MainActivity.kt
+--------------------------------------------------------------------------------
+package com.example.miiptvvodtv
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import com.example.miiptvvodtv.ui.screens.MainScreen
+import com.example.miiptvvodtv.ui.theme.MiIPTVVODTVTheme
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            MiIPTVVODTVTheme {
+                MainScreen()
+            }
+        }
+    }
+}
+
+--------------------------------------------------------------------------------
+[12] Ruta: app/src/main/java/com/example/miiptvvodtv/ApiService.kt
+--------------------------------------------------------------------------------
+package com.example.miiptvvodtv
+
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.GET
+import java.util.concurrent.TimeUnit
+
+data class MediaResponse(
+    val channels: List<Channel>?
+)
+
+interface ApiService {
+    @GET("Luchitxo/listas-iptv/refs/heads/main/tv_vod.json")
+    suspend fun getContent(): MediaResponse
+
+    companion object {
+        private const val BASE_URL = "https://raw.githubusercontent.com/"
+
+        val instance: ApiService by lazy {
+            val okHttpClient = OkHttpClient.Builder()
+                .connectTimeout(20, TimeUnit.SECONDS)
+                .readTimeout(20, TimeUnit.SECONDS)
+                .writeTimeout(20, TimeUnit.SECONDS)
+                .retryOnConnectionFailure(true)
+                .build()
+
+            Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(ApiService::class.java)
+        }
+    }
+}
+
+--------------------------------------------------------------------------------
+[13] Ruta: app/src/main/java/com/example/miiptvvodtv/Models.kt
+--------------------------------------------------------------------------------
+package com.example.miiptvvodtv
+
+import androidx.compose.runtime.Immutable
+
+object FilterConstants {
+    const val ALL = "Todas"
+    const val FAVORITES = "Favoritos"
+}
+
+@Immutable
+data class ChannelAlternative(
+    val url: String = "",
+    val headers: Map<String, String>? = null
+)
+
+@Immutable
+data class Channel(
+    val id: String = "",
+    val name: String = "Canal sin nombre",
+    val category: String = "General",
+    val logo: String = "",
+    val url: String = "",
+    val headers: Map<String, String>? = null,
+    val alternatives: List<ChannelAlternative>? = null
+)
+
+--------------------------------------------------------------------------------
+[14] Ruta: app/src/main/java/com/example/miiptvvodtv/data/M3UParser.kt
+--------------------------------------------------------------------------------
+package com.example.miiptvvodtv.data
+
+import com.example.miiptvvodtv.Channel
+import java.util.UUID
+
+object M3UParser {
+
+    fun parse(m3uContent: String): List<Channel> {
+        val channels = mutableListOf<Channel>()
+        val lines = m3uContent.lines()
+
+        var currentName = "Canal sin nombre"
+        var currentCategory = "General"
+        var currentLogo = ""
+        var currentId = ""
+        var currentHeaders = mutableMapOf<String, String>()
+        var pendingExtinf = false
+
+        val extinfRegex = Regex("""#EXTINF:(?:-?\d+)?\s*(.*)""", RegexOption.IGNORE_CASE)
+        val attrRegex = Regex("""([a-zA-Z0-9_-]+)=["']?([^"']*)["']?""")
+
+        for (line in lines) {
+            val trimmed = line.trim()
+            if (trimmed.isEmpty()) continue
+
+            when {
+                trimmed.startsWith("#EXTM3U", ignoreCase = true) -> {
+                    // Header M3U
+                }
+                trimmed.startsWith("#EXTINF", ignoreCase = true) -> {
+                    pendingExtinf = true
+                    currentName = "Canal sin nombre"
+                    currentCategory = "General"
+                    currentLogo = ""
+                    currentId = ""
+                    currentHeaders.clear()
+
+                    val match = extinfRegex.find(trimmed)
+                    if (match != null) {
+                        val paramsAndTitle = match.groupValues[1]
+
+                        attrRegex.findAll(paramsAndTitle).forEach { attrMatch ->
+                            val key = attrMatch.groupValues[1].lowercase()
+                            val value = attrMatch.groupValues[2]
+                            when {
+                                key.contains("tvg-id") -> currentId = value
+                                key.contains("tvg-name") && currentName == "Canal sin nombre" -> currentName = value
+                                key.contains("tvg-logo") -> currentLogo = value
+                                key.contains("group-title") -> currentCategory = value
+                            }
+                        }
+
+                        val commaIndex = paramsAndTitle.lastIndexOf(',')
+                        if (commaIndex != -1 && commaIndex < paramsAndTitle.length - 1) {
+                            val title = paramsAndTitle.substring(commaIndex + 1).trim()
+                            if (title.isNotEmpty()) {
+                                currentName = title
+                            }
+                        }
+                    }
+                }
+                trimmed.startsWith("#EXTVLCOPT", ignoreCase = true) -> {
+                    val optContent = trimmed.substringAfter("#EXTVLCOPT:", "").trim()
+                    if (optContent.contains("http-user-agent=", ignoreCase = true)) {
+                        val ua = optContent.substringAfter("http-user-agent=", "").trim()
+                        if (ua.isNotEmpty()) {
+                            currentHeaders["User-Agent"] = ua
+                        }
+                    } else if (optContent.contains("http-referer=", ignoreCase = true) || optContent.contains("http-referrer=", ignoreCase = true)) {
+                        val ref = optContent.substringAfter("http-referer=", "").let { if (it == optContent) optContent.substringAfter("http-referrer=", "") else it }.trim()
+                        if (ref.isNotEmpty()) {
+                            currentHeaders["Referer"] = ref
+                        }
+                    }
+                }
+                !trimmed.startsWith("#") && pendingExtinf -> {
+                    val url = trimmed
+                    val finalId = if (currentId.isNotBlank()) currentId else UUID.nameUUIDFromBytes(url.toByteArray()).toString()
+
+                    channels.add(
+                        Channel(
+                            id = finalId,
+                            name = currentName,
+                            category = currentCategory.ifEmpty { "General" },
+                            logo = currentLogo,
+                            url = url,
+                            headers = if (currentHeaders.isNotEmpty()) currentHeaders.toMap() else null
+                        )
+                    )
+                    pendingExtinf = false
+                }
+            }
+        }
+
+        return channels
+    }
+}
+
+--------------------------------------------------------------------------------
+[15] Ruta: app/src/main/java/com/example/miiptvvodtv/data/MediaRepository.kt
+--------------------------------------------------------------------------------
+package com.example.miiptvvodtv.data
+
+import android.content.Context
+import android.util.Log
+import coil.imageLoader
+import coil.request.CachePolicy
+import coil.request.ImageRequest
+import com.example.miiptvvodtv.ApiService
+import com.example.miiptvvodtv.Channel
+import com.example.miiptvvodtv.MediaResponse
+import com.google.gson.Gson
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.util.concurrent.TimeUnit
+import okhttp3.OkHttpClient
+import okhttp3.Request
+
+data class FetchResult(
+    val data: MediaResponse,
+    val isFromCache: Boolean
+)
+
+data class CachedMediaWrapper(
+    val timestamp: Long,
+    val data: MediaResponse
+)
+
+class MediaRepository(private val context: Context) {
+
+    private val gson = Gson()
+    private val cacheFile: File by lazy {
+        File(context.cacheDir, "media_cache_v2.json")
+    }
+
+    fun getCachedContent(): MediaResponse? {
+        return try {
+            if (cacheFile.exists()) {
+                val jsonString = cacheFile.readText()
+                val wrapper = gson.fromJson(jsonString, CachedMediaWrapper::class.java)
+                wrapper?.data
+            } else {
+                val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                val oldJson = prefs.getString(KEY_CACHE_JSON, null)
+                if (!oldJson.isNullOrEmpty()) {
+                    gson.fromJson(oldJson, MediaResponse::class.java)
+                } else {
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            Log.e(TAG, "Error al leer datos de la caché local", e)
+            null
+        }
+    }
+
+    suspend fun fetchAndSaveRemoteContent(
+        onProgress: (percent: Int, status: String) -> Unit = { _, _ -> }
+    ): MediaResponse = withContext(Dispatchers.IO) {
+        onProgress(10, "Actualizando desde la nube...")
+
+        val rawText = try {
+            val client = OkHttpClient.Builder()
+                .connectTimeout(20, TimeUnit.SECONDS)
+                .readTimeout(20, TimeUnit.SECONDS)
+                .build()
+            val request = Request.Builder()
+                .url("https://raw.githubusercontent.com/Luchitxo/listas-iptv/refs/heads/main/tv_vod.json")
+                .build()
+            client.newCall(request).execute().use { response ->
+                response.body?.string() ?: ""
+            }
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            Log.e(TAG, "Error descargando contenido crudo, intentando fallback Retrofit", e)
+            val retrofitRes = ApiService.instance.getContent()
+            return@withContext processMediaResponse(retrofitRes, onProgress)
+        }
+
+        val channels = if (rawText.trim().startsWith("#EXTM3U", ignoreCase = true) || rawText.contains("#EXTINF:")) {
+            M3UParser.parse(rawText)
+        } else {
+            val resp = gson.fromJson(rawText, MediaResponse::class.java)
+            resp?.channels ?: emptyList()
+        }
+
+        processChannels(channels, onProgress)
+    }
+
+    private fun processMediaResponse(
+        response: MediaResponse,
+        onProgress: (percent: Int, status: String) -> Unit
+    ): MediaResponse {
+        return processChannels(response.channels ?: emptyList(), onProgress)
+    }
+
+    private fun processChannels(
+        rawChannels: List<Channel>,
+        onProgress: (percent: Int, status: String) -> Unit
+    ): MediaResponse {
+        if (rawChannels.isEmpty()) {
+            throw IllegalStateException("El servidor devolvió una lista vacía de canales.")
+        }
+
+        onProgress(50, "Validando y filtrando canales...")
+        val validChannels = rawChannels.filter {
+            !it.id.isBlank() && !it.url.isBlank()
+        }.map { channel ->
+            channel.copy(
+                name = if (channel.name.isBlank()) "Canal sin nombre" else channel.name,
+                category = if (channel.category.isBlank()) "General" else channel.category
+            )
+        }.distinctBy { it.id }
+
+        if (validChannels.isEmpty()) {
+            throw IllegalStateException("No hay canales válidos tras la validación.")
+        }
+
+        val sanitizedResponse = MediaResponse(channels = validChannels)
+
+        onProgress(80, "Guardando caché en archivo...")
+        val wrapper = CachedMediaWrapper(
+            timestamp = System.currentTimeMillis(),
+            data = sanitizedResponse
+        )
+        cacheFile.writeText(gson.toJson(wrapper))
+
+        preloadImages(validChannels, getFavorites())
+
+        onProgress(100, "¡Actualizado con éxito!")
+        return sanitizedResponse
+    }
+
+    suspend fun getMediaContent(
+        onProgress: (percent: Int, status: String) -> Unit = { _, _ -> }
+    ): FetchResult = withContext(Dispatchers.IO) {
+        val cached = getCachedContent()
+        if (cached != null && !cached.channels.isNullOrEmpty()) {
+            FetchResult(data = cached, isFromCache = true)
+        } else {
+            val freshData = fetchAndSaveRemoteContent(onProgress)
+            FetchResult(data = freshData, isFromCache = false)
+        }
+    }
+
+    private fun preloadImages(channels: List<Channel>, favoriteIds: Set<String>) {
+        val imageLoader = context.imageLoader
+        val favoriteChannels = channels.filter { favoriteIds.contains(it.id) }
+        val otherChannels = channels.filter { !favoriteIds.contains(it.id) }
+        val channelsToPreload = (favoriteChannels + otherChannels).distinctBy { it.id }.take(50)
+
+        channelsToPreload.forEach { channel ->
+            if (channel.logo.isNotEmpty()) {
+                val request = ImageRequest.Builder(context)
+                    .data(channel.logo)
+                    .size(160, 160)
+                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .diskCachePolicy(CachePolicy.ENABLED)
+                    .build()
+                imageLoader.enqueue(request)
+            }
+        }
+    }
+
+    fun getFavorites(): Set<String> {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getStringSet(KEY_FAVORITES, emptySet()) ?: emptySet()
+    }
+
+    fun toggleFavorite(id: String): Set<String> {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val currentFavorites = getFavorites().toMutableSet()
+        if (currentFavorites.contains(id)) {
+            currentFavorites.remove(id)
+        } else {
+            currentFavorites.add(id)
+        }
+        prefs.edit().putStringSet(KEY_FAVORITES, currentFavorites).apply()
+        return currentFavorites
+    }
+
+    fun getPreferredUrl(channelId: String): String? {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getString("preferred_url_$channelId", null)
+    }
+
+    fun savePreferredUrl(channelId: String, url: String) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString("preferred_url_$channelId", url).apply()
+    }
+
+    fun clearPreferredUrl(channelId: String) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().remove("preferred_url_$channelId").apply()
+    }
+
+    companion object {
+        private const val TAG = "MediaRepository"
+        private const val PREFS_NAME = "mi_iptv_vod_prefs"
+        private const val KEY_CACHE_JSON = "cached_media_json"
+        private const val KEY_FAVORITES = "favorite_ids"
+    }
+}
+
+--------------------------------------------------------------------------------
+[16] Ruta: app/src/main/java/com/example/miiptvvodtv/utils/DeviceUtils.kt
+--------------------------------------------------------------------------------
+package com.example.miiptvvodtv.utils
+
+import android.app.UiModeManager
+import android.content.Context
+import android.content.pm.PackageManager
+import android.content.res.Configuration
+
+object DeviceUtils {
+    fun isTvDevice(context: Context): Boolean {
+        val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as? UiModeManager
+        if (uiModeManager?.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION) {
+            return true
+        }
+        return context.packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
+    }
+}
+
+--------------------------------------------------------------------------------
+[17] Ruta: app/src/main/java/com/example/miiptvvodtv/ui/theme/Color.kt
+--------------------------------------------------------------------------------
+package com.example.miiptvvodtv.ui.theme
+
+import androidx.compose.ui.graphics.Color
+
+val DeepSlateBlack = Color(0xFF0B0F19)
+val CharcoalNavy = Color(0xFF1E2640)
+val ElectricCyan = Color(0xFF06B6D4)
+val LightCyan = Color(0xFF22D3EE)
+
+val TextPrimaryWhite = Color(0xFFFFFFFF)
+val TextSecondaryGrey = Color(0xFF94A3B8)
+val GoldStar = Color(0xFFFFD700)
+
+--------------------------------------------------------------------------------
+[18] Ruta: app/src/main/java/com/example/miiptvvodtv/ui/theme/Theme.kt
+--------------------------------------------------------------------------------
+package com.example.miiptvvodtv.ui.theme
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.tv.material3.ExperimentalTvMaterial3Api
+import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.darkColorScheme
+
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+fun MiIPTVVODTVTheme(
+    content: @Composable () -> Unit,
+) {
+    val darkColorScheme = darkColorScheme(
+        primary = ElectricCyan,
+        onPrimary = DeepSlateBlack,
+        secondary = LightCyan,
+        onSecondary = DeepSlateBlack,
+        tertiary = LightCyan,
+        background = DeepSlateBlack,
+        onBackground = TextPrimaryWhite,
+        surface = Color(0xFF161E2E),
+        onSurface = TextPrimaryWhite,
+        surfaceVariant = Color(0xFF1E2842),
+        onSurfaceVariant = TextSecondaryGrey
+    )
+
+    MaterialTheme(
+        colorScheme = darkColorScheme,
+        typography = Typography,
+        content = content
+    )
+}
+
+--------------------------------------------------------------------------------
+[19] Ruta: app/src/main/java/com/example/miiptvvodtv/ui/theme/Type.kt
+--------------------------------------------------------------------------------
+package com.example.miiptvvodtv.ui.theme
+
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import androidx.tv.material3.ExperimentalTvMaterial3Api
+import androidx.tv.material3.Typography
+
+@OptIn(ExperimentalTvMaterial3Api::class)
+val Typography = Typography(
+    bodyLarge = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.5.sp
+    )
+)
+
+--------------------------------------------------------------------------------
+[20] Ruta: app/src/main/java/com/example/miiptvvodtv/ui/components/ChannelsGrid.kt
+--------------------------------------------------------------------------------
+package com.example.miiptvvodtv.ui.components
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card as MobileCard
+import androidx.compose.material3.CardDefaults as MobileCardDefaults
+import androidx.compose.material3.Surface as MobileSurface
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusRestorer
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.tv.material3.*
+import coil.compose.AsyncImage
+import coil.request.CachePolicy
+import coil.request.ImageRequest
+import coil.size.Precision
+import com.example.miiptvvodtv.Channel
+import com.example.miiptvvodtv.FilterConstants
+import com.example.miiptvvodtv.ui.theme.ElectricCyan
+import com.example.miiptvvodtv.ui.theme.GoldStar
+import kotlinx.coroutines.delay
+
+@OptIn(ExperimentalTvMaterial3Api::class, ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
+@Composable
+fun ChannelsGrid(
+    channels: List<Channel>,
+    favoriteIds: Set<String>,
+    modifier: Modifier = Modifier,
+    isTv: Boolean = true,
+    selectedCategory: String = FilterConstants.ALL,
+    lastSelectedId: String? = null,
+    focusRestoreTrigger: Int = 0,
+    onChannelClick: (Channel) -> Unit,
+    onLongChannelClick: ((Channel) -> Unit)? = null,
+    onToggleFavorite: (String) -> Unit
+) {
+    val context = LocalContext.current
+    val displayChannels = remember(channels) { channels }
+
+    if (displayChannels.isEmpty()) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(180.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "No hay canales disponibles.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White.copy(alpha = 0.6f)
+            )
+        }
+        return
+    }
+
+    val groupedChannels by remember(displayChannels) {
+        derivedStateOf {
+            displayChannels.groupBy { cleanCategoryName(it.category.ifEmpty { "General" }) }
+        }
+    }
+
+    val expandedCategoriesState = remember { mutableStateMapOf<String, Boolean>() }
+
+    LaunchedEffect(lastSelectedId, focusRestoreTrigger, displayChannels) {
+        if (!lastSelectedId.isNullOrEmpty()) {
+            val targetChannel = displayChannels.find { it.id == lastSelectedId }
+            if (targetChannel != null) {
+                val categoryName = cleanCategoryName(targetChannel.category.ifEmpty { "General" })
+                expandedCategoriesState[categoryName] = true
+            }
+        }
+    }
+
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .focusRestorer(),
+        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        groupedChannels.forEach { (categoryName, channelList) ->
+            val isOpen = expandedCategoriesState.getOrPut(categoryName) { false }
+
+            item(key = "accordion_header_$categoryName") {
+                if (isTv) {
+                    Surface(
+                        onClick = { expandedCategoriesState[categoryName] = !isOpen },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        shape = ClickableSurfaceDefaults.shape(shape = RoundedCornerShape(12.dp)),
+                        scale = ClickableSurfaceDefaults.scale(focusedScale = 1.02f),
+                        colors = ClickableSurfaceDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            focusedContainerColor = ElectricCyan.copy(alpha = 0.25f)
+                        ),
+                        border = ClickableSurfaceDefaults.border(
+                            border = Border(border = BorderStroke(1.dp, ElectricCyan.copy(alpha = 0.3f))),
+                            focusedBorder = Border(border = BorderStroke(2.dp, ElectricCyan))
+                        )
+                    ) {
+                        CategoryHeaderContent(categoryName, channelList.size, isOpen)
+                    }
+                } else {
+                    MobileSurface(
+                        onClick = { expandedCategoriesState[categoryName] = !isOpen },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant,
+                        border = BorderStroke(1.dp, ElectricCyan.copy(alpha = 0.3f))
+                    ) {
+                        CategoryHeaderContent(categoryName, channelList.size, isOpen)
+                    }
+                }
+            }
+
+            if (isOpen) {
+                val channelRows = channelList.chunked(6)
+                items(
+                    items = channelRows,
+                    key = { row -> "row_${categoryName}_${row.first().id}" }
+                ) { rowChannels ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 2.dp, end = 2.dp, bottom = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        rowChannels.forEach { channel ->
+                            Box(modifier = Modifier.weight(1f)) {
+                                val isFav = favoriteIds.contains(channel.id)
+                                val focusRequester = remember { FocusRequester() }
+                                val isSelected = channel.id == lastSelectedId
+
+                                LaunchedEffect(isSelected, focusRestoreTrigger, isTv) {
+                                    if (isSelected && isTv) {
+                                        delay(150)
+                                        try {
+                                            focusRequester.requestFocus()
+                                        } catch (e: Exception) {
+                                            e.printStackTrace()
+                                        }
+                                    }
+                                }
+
+                                if (isTv) {
+                                    Card(
+                                        onClick = { onChannelClick(channel) },
+                                        onLongClick = { onLongChannelClick?.invoke(channel) },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(105.dp)
+                                            .focusRequester(focusRequester),
+                                        shape = CardDefaults.shape(shape = RoundedCornerShape(12.dp)),
+                                        scale = CardDefaults.scale(focusedScale = 1.05f),
+                                        border = CardDefaults.border(
+                                            border = Border(border = BorderStroke(1.dp, Color.White.copy(alpha = 0.18f))),
+                                            focusedBorder = Border(border = BorderStroke(2.5.dp, ElectricCyan))
+                                        ),
+                                        colors = CardDefaults.colors(
+                                            containerColor = MaterialTheme.colorScheme.surface,
+                                            focusedContainerColor = MaterialTheme.colorScheme.surface
+                                        )
+                                    ) {
+                                        ChannelCardContent(context, channel, isFav, onToggleFavorite)
+                                    }
+                                } else {
+                                    MobileCard(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(100.dp)
+                                            .combinedClickable(
+                                                onClick = { onChannelClick(channel) },
+                                                onLongClick = { onLongChannelClick?.invoke(channel) }
+                                            ),
+                                        shape = RoundedCornerShape(12.dp),
+                                        colors = MobileCardDefaults.cardColors(
+                                            containerColor = MaterialTheme.colorScheme.surface
+                                        )
+                                    ) {
+                                        ChannelCardContent(context, channel, isFav, onToggleFavorite)
+                                    }
+                                }
+                            }
+                        }
+                        repeat(6 - rowChannels.size) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CategoryHeaderContent(categoryName: String, count: Int, isOpen: Boolean) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = categoryName.uppercase(),
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
+                color = ElectricCyan
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = "($count canales)",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White.copy(alpha = 0.6f)
+            )
+        }
+
+        Text(
+            text = if (isOpen) "▲ Plegar" else "▼ Desplegar",
+            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+            color = ElectricCyan
+        )
+    }
+}
+
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+private fun ChannelCardContent(
+    context: android.content.Context,
+    channel: Channel,
+    isFav: Boolean,
+    onToggleFavorite: (String) -> Unit
+) {
+    var imageFailed by remember(channel.logo) { mutableStateOf(false) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .background(
+                        color = Color.White.copy(alpha = 0.08f),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .border(
+                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.12f)),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .padding(4.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                if (!imageFailed && channel.logo.isNotEmpty()) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(context)
+                            .data(channel.logo)
+                            .crossfade(150)
+                            .size(160, 160)
+                            .precision(Precision.INEXACT)
+                            .memoryCachePolicy(CachePolicy.ENABLED)
+                            .diskCachePolicy(CachePolicy.ENABLED)
+                            .build(),
+                        contentDescription = channel.name,
+                        contentScale = ContentScale.Fit,
+                        onError = { imageFailed = true },
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Text(
+                        text = channel.name.take(1).uppercase(),
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Black,
+                            fontSize = 22.sp
+                        ),
+                        color = ElectricCyan
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = channel.name,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp
+                ),
+                color = Color.White,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        Text(
+            text = if (isFav) "★" else "☆",
+            fontSize = 15.sp,
+            color = if (isFav) GoldStar else Color.White.copy(alpha = 0.6f),
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(6.dp)
+                .clickable { onToggleFavorite(channel.id) }
+        )
+    }
+}
+
+fun cleanCategoryName(name: String): String {
+    return name.replace(Regex("[\\uD83C-\\uDBFF\\uDC00-\\uDFFF\\u2600-\\u27BF\\uD83D\\uDC00-\\uD83D\\uDDFF\\uD83E\\uDD00-\\uD83E\\uDDFF]"), "").trim()
+}
+
+--------------------------------------------------------------------------------
+[21] Ruta: app/src/main/java/com/example/miiptvvodtv/ui/components/VideoPlayer.kt
+--------------------------------------------------------------------------------
+package com.example.miiptvvodtv.ui.components
+
+import android.content.Context
+import android.net.Uri
+import android.util.Log
+import android.view.KeyEvent
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MimeTypes
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.common.Tracks
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.media3.exoplayer.DefaultRenderersFactory
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.ui.PlayerView
+import androidx.tv.material3.*
+import com.example.miiptvvodtv.Channel
+import com.example.miiptvvodtv.ChannelAlternative
+import com.example.miiptvvodtv.ui.theme.ElectricCyan
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+
+private const val TAG = "VideoPlayer"
+
+private enum class TrackStatus {
+    OK, NO_VIDEO, NO_AUDIO, AUDIO_UNSUPPORTED
+}
+
+private fun checkTracks(player: ExoPlayer): TrackStatus {
+    val tracks = player.currentTracks
+    var hasSupportedVideo = false
+    var hasSupportedAudio = false
+    val audioMimeTypes = mutableListOf<String>()
+
+    for (group in tracks.groups) {
+        if (group.type == C.TRACK_TYPE_VIDEO) {
+            for (i in 0 until group.length) {
+                if (group.isTrackSupported(i)) {
+                    hasSupportedVideo = true
+                    break
+                }
+            }
+        } else if (group.type == C.TRACK_TYPE_AUDIO) {
+            for (i in 0 until group.length) {
+                if (group.isTrackSupported(i)) {
+                    hasSupportedAudio = true
+                    val format = group.getTrackFormat(i)
+                    format.sampleMimeType?.let { audioMimeTypes.add(it) }
+                }
+            }
+        }
+    }
+
+    if (!hasSupportedVideo) {
+        return TrackStatus.NO_VIDEO
+    }
+    if (!hasSupportedAudio) {
+        return TrackStatus.NO_AUDIO
+    }
+
+    if (audioMimeTypes.isNotEmpty() && audioMimeTypes.all { it == MimeTypes.AUDIO_AC3 || it == MimeTypes.AUDIO_E_AC3 }) {
+        return TrackStatus.AUDIO_UNSUPPORTED
+    }
+
+    return TrackStatus.OK
+}
+
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+fun VideoPlayer(
+    context: Context,
+    videoUrl: String,
+    channelName: String = "Canal en Vivo",
+    channelHeaders: Map<String, String>? = null,
+    channelAlternatives: List<ChannelAlternative> = emptyList(),
+    channelsList: List<Channel> = emptyList(),
+    currentChannelId: String = "",
+    previousChannel: Channel? = null,
+    onChannelChange: (Channel) -> Unit = {},
+    onPlaybackStable: (String) -> Unit = {},
+    onPlaybackFailed: () -> Unit = {},
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var isPlaybackError by remember { mutableStateOf(false) }
+    var errorMessageDetails by remember { mutableStateOf("Error desconocido en la reproducción") }
+    var isInactivePrompt by remember { mutableStateOf(false) }
+    var isBuffering by remember { mutableStateOf(true) }
+    var autoRetryCount by remember { mutableIntStateOf(0) }
+    var alternativeIndex by remember { mutableIntStateOf(-1) }
+    var currentActiveUrl by remember { mutableStateOf(videoUrl) }
+    val maxAutoRetries = 4
+
+    var isPlaying by remember { mutableStateOf(true) }
+    var showControlsOverlay by remember { mutableStateOf(true) }
+
+    val playerFocusRequester = remember { FocusRequester() }
+    val retryFocusRequester = remember { FocusRequester() }
+    val inactiveFocusRequester = remember { FocusRequester() }
+    val coroutineScope = rememberCoroutineScope()
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    val currentChannelIndex = remember(currentChannelId, channelsList) {
+        channelsList.indexOfFirst { it.id == currentChannelId }
+    }
+
+    BackHandler {
+        onBack()
+    }
+
+    LaunchedEffect(showControlsOverlay) {
+        if (!showControlsOverlay) {
+            delay(50)
+            playerFocusRequester.requestFocus()
+        }
+    }
+
+    val exoPlayer = remember(videoUrl, channelHeaders) {
+        Log.i("AudioDebug", "Iniciando reproductor ExoPlayer para URL: $videoUrl")
+
+        val defaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+
+        val requestHeaders = mutableMapOf(
+            "User-Agent" to defaultUserAgent
+        )
+
+        if (!channelHeaders.isNullOrEmpty()) {
+            requestHeaders.putAll(channelHeaders)
+        }
+
+        val effectiveUserAgent = requestHeaders["User-Agent"] ?: defaultUserAgent
+
+        val httpDataSourceFactory = DefaultHttpDataSource.Factory()
+            .setUserAgent(effectiveUserAgent)
+            .setAllowCrossProtocolRedirects(true)
+            .setConnectTimeoutMs(20000)
+            .setReadTimeoutMs(20000)
+            .setDefaultRequestProperties(requestHeaders)
+
+        val mediaSourceFactory = DefaultMediaSourceFactory(context)
+            .setDataSourceFactory(httpDataSourceFactory)
+
+        val loadControl = DefaultLoadControl.Builder()
+            .setBufferDurationsMs(12000, 40000, 2000, 4000)
+            .setPrioritizeTimeOverSizeThresholds(true)
+            .build()
+
+        val renderersFactory = DefaultRenderersFactory(context)
+            .setEnableDecoderFallback(true)
+
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(C.USAGE_MEDIA)
+            .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+            .build()
+
+        ExoPlayer.Builder(context, renderersFactory)
+            .setMediaSourceFactory(mediaSourceFactory)
+            .setLoadControl(loadControl)
+            .build()
+            .apply {
+                setAudioAttributes(audioAttributes, true)
+                setHandleAudioBecomingNoisy(true)
+
+                val mediaItem = when {
+                    videoUrl.contains(".mpd", ignoreCase = true) -> {
+                        MediaItem.Builder()
+                            .setUri(Uri.parse(videoUrl))
+                            .setMimeType(MimeTypes.APPLICATION_MPD)
+                            .build()
+                    }
+                    else -> {
+                        MediaItem.Builder()
+                            .setUri(Uri.parse(videoUrl))
+                            .setMimeType(MimeTypes.APPLICATION_M3U8)
+                            .build()
+                    }
+                }
+                setMediaItem(mediaItem)
+                prepare()
+                playWhenReady = true
+            }
+    }
+
+    val switchToNextAlternative: () -> Unit = {
+        if (alternativeIndex + 1 < channelAlternatives.size) {
+            alternativeIndex++
+            val alt = channelAlternatives[alternativeIndex]
+            currentActiveUrl = alt.url
+            Log.i("Fallback", "Cambiando a alternativa index=$alternativeIndex, url=${alt.url}")
+            Log.i("Preferred", "Usando URL alternativa: ${alt.url}")
+            autoRetryCount = 0
+
+            try {
+                val altMediaItem = MediaItem.Builder()
+                    .setUri(Uri.parse(alt.url))
+                    .setMimeType(if (alt.url.contains(".mpd", ignoreCase = true)) MimeTypes.APPLICATION_MPD else MimeTypes.APPLICATION_M3U8)
+                    .build()
+                exoPlayer.setMediaItem(altMediaItem)
+                exoPlayer.prepare()
+                exoPlayer.playWhenReady = true
+            } catch (e: Exception) {
+                Log.e(TAG, "Error al cambiar a alternativa index=$alternativeIndex", e)
+                onPlaybackFailed()
+                isPlaybackError = true
+            }
+        } else {
+            onPlaybackFailed()
+            isPlaybackError = true
+        }
+    }
+
+    LaunchedEffect(exoPlayer, currentActiveUrl) {
+        var stableTimerReached = false
+
+        coroutineScope.launch {
+            delay(15000L)
+            if (!isPlaybackError) {
+                stableTimerReached = true
+                if (exoPlayer.playbackState == Player.STATE_READY && exoPlayer.isPlaying) {
+                    Log.i("Preferred", "Reproducción estable detectada por timeout (15s) en URL: $currentActiveUrl")
+                    onPlaybackStable(currentActiveUrl)
+                } else {
+                    Log.i("Preferred", "Timeout 15s alcanzado pero el reproductor NO está en STATE_READY/isPlaying (state=${exoPlayer.playbackState}, isPlaying=${exoPlayer.isPlaying})")
+                }
+            }
+        }
+
+        delay(8000L)
+        if (!isPlaybackError && !stableTimerReached) {
+            val status = checkTracks(exoPlayer)
+            Log.i("TrackCheck", "Verificación de pistas a los 8s para URL $currentActiveUrl: $status")
+
+            when (status) {
+                TrackStatus.NO_VIDEO, TrackStatus.AUDIO_UNSUPPORTED -> {
+                    Log.i("TrackCheck", "Estado $status detectado. Disparando fallback a alternativa...")
+                    switchToNextAlternative()
+                }
+                TrackStatus.NO_AUDIO -> {
+                    Log.i("TrackCheck", "Canal sin audio detectado (NO_AUDIO). Se mantiene reproduciendo.")
+                    if (exoPlayer.playbackState == Player.STATE_READY && exoPlayer.isPlaying) {
+                        onPlaybackStable(currentActiveUrl)
+                    }
+                }
+                TrackStatus.OK -> {
+                    Log.i("TrackCheck", "Pistas correctas (OK).")
+                    if (exoPlayer.playbackState == Player.STATE_READY && exoPlayer.isPlaying) {
+                        Log.i("TrackCheck", "Reproductor listo y reproduciendo. Marcando playback estable.")
+                        onPlaybackStable(currentActiveUrl)
+                    }
+                }
+            }
+        }
+    }
+
+    DisposableEffect(lifecycleOwner, exoPlayer) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_STOP -> {
+                    if (exoPlayer.isPlaying) {
+                        exoPlayer.pause()
+                    }
+                }
+                else -> {}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    AutoCloseableDisposable(exoPlayer)
+
+    LaunchedEffect(exoPlayer) {
+        exoPlayer.addListener(object : Player.Listener {
+            override fun onIsPlayingChanged(playing: Boolean) {
+                isPlaying = playing
+            }
+
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                isBuffering = playbackState == Player.STATE_BUFFERING
+            }
+
+            override fun onTracksChanged(tracks: Tracks) {
+                val audioGroupsCount = tracks.groups.count { it.type == C.TRACK_TYPE_AUDIO }
+                val videoGroupsCount = tracks.groups.count { it.type == C.TRACK_TYPE_VIDEO }
+
+                if (videoGroupsCount == 0) {
+                    Log.i("AudioDebug", "NO VIDEO TRACKS")
+                } else {
+                    for ((groupIndex, group) in tracks.groups.withIndex()) {
+                        if (group.type == C.TRACK_TYPE_VIDEO) {
+                            for (i in 0 until group.length) {
+                                val format = group.getTrackFormat(i)
+                                val isSelected = group.isTrackSelected(i)
+                                val mimeType = format.sampleMimeType ?: "unknown"
+                                val codecs = format.codecs ?: "unknown"
+                                val width = format.width
+                                val height = format.height
+                                val frameRate = format.frameRate
+                                val bitrate = format.bitrate
+
+                                Log.i("AudioDebug", "Video Group [$groupIndex] Track [$i]: sampleMimeType=$mimeType, codecs=$codecs, width=$width, height=$height, frameRate=$frameRate, bitrate=$bitrate, isSelected=$isSelected")
+                            }
+                        }
+                    }
+                }
+
+                Log.i("AudioDebug", "onTracksChanged detectó $audioGroupsCount grupos de audio y $videoGroupsCount grupos de video.")
+
+                for ((groupIndex, group) in tracks.groups.withIndex()) {
+                    if (group.type == C.TRACK_TYPE_AUDIO) {
+                        for (i in 0 until group.length) {
+                            val format = group.getTrackFormat(i)
+                            val isSelected = group.isTrackSelected(i)
+                            val mimeType = format.sampleMimeType ?: "unknown"
+                            val codecs = format.codecs ?: "unknown"
+                            val channelCount = format.channelCount
+                            val sampleRate = format.sampleRate
+                            val bitrate = format.bitrate
+                            val language = format.language ?: "und"
+
+                            Log.i("AudioDebug", "Audio Group [$groupIndex] Track [$i]: sampleMimeType=$mimeType, codecs=$codecs, channelCount=$channelCount, sampleRate=$sampleRate, bitrate=$bitrate, language=$language, isSelected=$isSelected")
+                        }
+                    }
+                }
+            }
+
+            override fun onAudioSessionIdChanged(audioSessionId: Int) {
+                Log.i("AudioDebug", "onAudioSessionIdChanged: audioSessionId=$audioSessionId")
+            }
+
+            override fun onPlayerError(error: PlaybackException) {
+                val errorCodeName = getExoPlayerErrorName(error.errorCode)
+                Log.e("AudioDebug", "onPlayerError [Code: ${error.errorCode} - $errorCodeName], causeMessage=${error.cause?.message}: ${error.localizedMessage}", error)
+
+                if (error.errorCode == PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW) {
+                    try {
+                        exoPlayer.seekToDefaultPosition()
+                        exoPlayer.prepare()
+                        exoPlayer.play()
+                        return
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error al intentar resincronizar BEHIND_LIVE_WINDOW", e)
+                    }
+                }
+
+                val isNetworkOrDecoderError = error.errorCode in arrayOf(
+                    PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED,
+                    PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT,
+                    PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS,
+                    PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND,
+                    PlaybackException.ERROR_CODE_DECODING_FAILED,
+                    PlaybackException.ERROR_CODE_DECODER_INIT_FAILED
+                ) || error.errorCode.toString().startsWith("20")
+
+                if (isNetworkOrDecoderError && autoRetryCount < maxAutoRetries) {
+                    autoRetryCount++
+                    val backoffMillis = (autoRetryCount * 1500L).coerceAtMost(6000L)
+                    coroutineScope.launch {
+                        delay(backoffMillis)
+                        try {
+                            exoPlayer.prepare()
+                            exoPlayer.playWhenReady = true
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Error en reintento de reproducción #$autoRetryCount", e)
+                        }
+                    }
+                } else {
+                    switchToNextAlternative()
+                }
+            }
+        })
+    }
+
+    LaunchedEffect(showControlsOverlay, isPlaying) {
+        if (showControlsOverlay && isPlaying && !isPlaybackError && !isInactivePrompt) {
+            delay(4000L)
+            showControlsOverlay = false
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        delay(100)
+        playerFocusRequester.requestFocus()
+    }
+
+    LaunchedEffect(exoPlayer) {
+        var lastPosition = -1L
+        var freezeCounterSeconds = 0
+        var hasStartedPlaying = false
+
+        while (isActive) {
+            delay(1000L)
+
+            if (!isPlaybackError && !isInactivePrompt) {
+                val playbackState = exoPlayer.playbackState
+                val currentPos = exoPlayer.currentPosition
+                val isPlayerPlaying = exoPlayer.isPlaying
+
+                if (playbackState == Player.STATE_READY) {
+                    hasStartedPlaying = true
+                }
+
+                val isPlayerBuffering = playbackState == Player.STATE_BUFFERING
+                val isStuckReady = playbackState == Player.STATE_READY && (currentPos == lastPosition) && isPlayerPlaying
+
+                if (isPlayerBuffering || isStuckReady) {
+                    freezeCounterSeconds++
+                    val threshold = if (!hasStartedPlaying) 15 else 6
+
+                    if (freezeCounterSeconds >= threshold) {
+                        freezeCounterSeconds = 0
+                        autoRetryCount++
+
+                        if (autoRetryCount > maxAutoRetries) {
+                            switchToNextAlternative()
+                        } else {
+                            try {
+                                if (isPlayerBuffering) {
+                                    exoPlayer.prepare()
+                                } else {
+                                    exoPlayer.seekTo(currentPos)
+                                }
+                                exoPlayer.play()
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error durante la auto-recuperación de congelamiento", e)
+                            }
+                        }
+                    }
+                } else {
+                    freezeCounterSeconds = 0
+                    if (playbackState == Player.STATE_READY) {
+                        autoRetryCount = 0
+                    }
+                }
+                lastPosition = currentPos
+            }
+        }
+    }
+
+    LaunchedEffect(exoPlayer) {
+        delay(2 * 60 * 60 * 1000L)
+        if (exoPlayer.isPlaying) {
+            exoPlayer.pause()
+            isInactivePrompt = true
+        }
+    }
+
+    LaunchedEffect(isPlaybackError) {
+        if (isPlaybackError) {
+            delay(100)
+            retryFocusRequester.requestFocus()
+        }
+    }
+
+    LaunchedEffect(isInactivePrompt) {
+        if (isInactivePrompt) {
+            delay(100)
+            inactiveFocusRequester.requestFocus()
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .focusRequester(playerFocusRequester)
+            .focusable()
+            .onKeyEvent { keyEvent ->
+                if (keyEvent.type == KeyEventType.KeyDown) {
+                    val keyCode = keyEvent.nativeKeyEvent.keyCode
+
+                    when (keyCode) {
+                        KeyEvent.KEYCODE_CHANNEL_UP, KeyEvent.KEYCODE_DPAD_UP -> {
+                            if (channelsList.isNotEmpty() && currentChannelIndex != -1) {
+                                val nextIndex = if (currentChannelIndex + 1 < channelsList.size) currentChannelIndex + 1 else 0
+                                onChannelChange(channelsList[nextIndex])
+                                showControlsOverlay = true
+                                return@onKeyEvent true
+                            }
+                        }
+                        KeyEvent.KEYCODE_CHANNEL_DOWN, KeyEvent.KEYCODE_DPAD_DOWN -> {
+                            if (channelsList.isNotEmpty() && currentChannelIndex != -1) {
+                                val prevIndex = if (currentChannelIndex - 1 >= 0) currentChannelIndex - 1 else channelsList.size - 1
+                                onChannelChange(channelsList[prevIndex])
+                                showControlsOverlay = true
+                                return@onKeyEvent true
+                            }
+                        }
+                        KeyEvent.KEYCODE_LAST_CHANNEL, KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
+                            if (previousChannel != null) {
+                                onChannelChange(previousChannel)
+                                showControlsOverlay = true
+                                return@onKeyEvent true
+                            }
+                        }
+                        KeyEvent.KEYCODE_DPAD_CENTER,
+                        KeyEvent.KEYCODE_ENTER,
+                        KeyEvent.KEYCODE_NUMPAD_ENTER,
+                        KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
+                        KeyEvent.KEYCODE_MEDIA_PLAY,
+                        KeyEvent.KEYCODE_MEDIA_PAUSE -> {
+                            if (exoPlayer.isPlaying) {
+                                exoPlayer.pause()
+                            } else {
+                                exoPlayer.play()
+                            }
+                            showControlsOverlay = true
+                            return@onKeyEvent true
+                        }
+                        KeyEvent.KEYCODE_DPAD_LEFT,
+                        KeyEvent.KEYCODE_DPAD_RIGHT -> {
+                            showControlsOverlay = true
+                            return@onKeyEvent false
+                        }
+                    }
+                }
+                false
+            }
+    ) {
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { ctx ->
+                PlayerView(ctx).apply {
+                    player = exoPlayer
+                    useController = false
+                    keepScreenOn = true
+                }
+            },
+            update = { playerView ->
+                playerView.player = exoPlayer
+            }
+        )
+
+        if (isBuffering && !isPlaybackError && !isInactivePrompt) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                TvCircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.primary,
+                    strokeWidth = 4.dp,
+                    modifier = Modifier.size(56.dp)
+                )
+            }
+        }
+
+        AnimatedVisibility(
+            visible = showControlsOverlay && !isPlaybackError && !isInactivePrompt,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .padding(24.dp)
+            ) {
+                Row(
+                    modifier = Modifier.align(Alignment.TopStart),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(Color.Red, shape = RoundedCornerShape(4.dp))
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "EN VIVO",
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Text(
+                        text = channelName,
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
+                        ),
+                        color = Color.White,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    if (channelsList.isNotEmpty() && currentChannelIndex != -1) {
+                        Text(
+                            text = "(${currentChannelIndex + 1}/${channelsList.size})",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = ElectricCyan,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+
+                Box(
+                    modifier = Modifier.align(Alignment.Center)
+                ) {
+                    Surface(
+                        modifier = Modifier.size(72.dp),
+                        shape = RoundedCornerShape(36.dp)
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Text(
+                                text = if (isPlaying) "❚❚" else "▶",
+                                color = Color.White,
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .background(Color.Black.copy(alpha = 0.7f), shape = RoundedCornerShape(12.dp))
+                        .padding(horizontal = 20.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Button(
+                            onClick = {
+                                if (exoPlayer.isPlaying) {
+                                    exoPlayer.pause()
+                                } else {
+                                    exoPlayer.play()
+                                }
+                                showControlsOverlay = true
+                            }
+                        ) {
+                            Text(if (isPlaying) "Pausar" else "Reproducir")
+                        }
+
+                        if (previousChannel != null) {
+                            Button(
+                                onClick = {
+                                    onChannelChange(previousChannel)
+                                    showControlsOverlay = true
+                                }
+                            ) {
+                                Text("↩ Volver a ${previousChannel.name}")
+                            }
+                        }
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "▲ / ▼ Cambiar canal",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.White.copy(alpha = 0.7f)
+                        )
+
+                        Button(
+                            onClick = onBack
+                        ) {
+                            Text("Volver al Menú")
+                        }
+                    }
+                }
+            }
+        }
+
+        if (isPlaybackError) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.95f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .widthIn(max = 550.dp)
+                        .padding(24.dp)
+                ) {
+                    Text(
+                        text = "Transmisión No Disponible",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = errorMessageDetails,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.85f),
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(28.dp))
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Button(
+                            onClick = {
+                                autoRetryCount = 0
+                                isPlaybackError = false
+                                exoPlayer.prepare()
+                                exoPlayer.playWhenReady = true
+                            },
+                            modifier = Modifier.focusRequester(retryFocusRequester)
+                        ) {
+                            Text("Reintentar")
+                        }
+
+                        Button(onClick = onBack) {
+                            Text("Volver al Menú")
+                        }
+                    }
+                }
+            }
+        }
+
+        if (isInactivePrompt && !isPlaybackError) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.95f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .widthIn(max = 550.dp)
+                        .padding(24.dp)
+                ) {
+                    Text(
+                        text = "¿Sigues viendo?",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = Color.White,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = "Pausamos la transmisión automática para evitar el consumo innecesario de datos.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.White.copy(alpha = 0.8f),
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(28.dp))
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Button(
+                            onClick = {
+                                isInactivePrompt = false
+                                exoPlayer.play()
+                            },
+                            modifier = Modifier.focusRequester(inactiveFocusRequester)
+                        ) {
+                            Text("Continuar Viendo")
+                        }
+
+                        Button(onClick = onBack) {
+                            Text("Salir al Menú")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AutoCloseableDisposable(player: ExoPlayer) {
+    DisposableEffect(player) {
+        onDispose {
+            player.stop()
+            player.release()
+        }
+    }
+}
+
+private fun getExoPlayerErrorName(errorCode: Int): String {
+    return when (errorCode) {
+        PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW -> "BEHIND_LIVE_WINDOW"
+        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED -> "IO_NETWORK_CONNECTION_FAILED"
+        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT -> "IO_NETWORK_CONNECTION_TIMEOUT"
+        PlaybackException.ERROR_CODE_IO_INVALID_HTTP_CONTENT_TYPE -> "IO_INVALID_HTTP_CONTENT_TYPE"
+        PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS -> "IO_BAD_HTTP_STATUS"
+        PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND -> "IO_FILE_NOT_FOUND"
+        PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED -> "PARSING_CONTAINER_MALFORMED"
+        PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED -> "PARSING_MANIFEST_MALFORMED"
+        PlaybackException.ERROR_CODE_DECODING_FAILED -> "DECODING_FAILED"
+        PlaybackException.ERROR_CODE_DECODER_INIT_FAILED -> "DECODER_INIT_FAILED"
+        PlaybackException.ERROR_CODE_AUDIO_TRACK_INIT_FAILED -> "AUDIO_TRACK_INIT_FAILED"
+        PlaybackException.ERROR_CODE_AUDIO_TRACK_WRITE_FAILED -> "AUDIO_TRACK_WRITE_FAILED"
+        else -> "ERROR_CODE_$errorCode"
+    }
+}

@@ -150,8 +150,7 @@ fun VideoPlayer(
     }
 
     val exoPlayer = remember(videoUrl, channelHeaders) {
-        // Tarea 4: Log con tag "Preferred" indicando qué URL se está usando al iniciar
-        Log.i("Preferred", "Iniciando reproductor con URL activa: $videoUrl")
+        Log.i("AudioDebug", "Iniciando reproductor ExoPlayer para URL: $videoUrl")
 
         val defaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
@@ -244,21 +243,23 @@ fun VideoPlayer(
         }
     }
 
-    // Tarea 4: LaunchedEffect de verificación de pistas (8s) y timer de estabilidad (15s)
+    // Validación de estabilidad estricta (STATE_READY && isPlaying)
     LaunchedEffect(exoPlayer, currentActiveUrl) {
         var stableTimerReached = false
 
-        // Lanzar timer de 15s sin error para marcar reproducción estable
         coroutineScope.launch {
             delay(15000L)
             if (!isPlaybackError) {
                 stableTimerReached = true
-                Log.i("Preferred", "Reproducción estable detectada por timeout (15s) en URL: $currentActiveUrl")
-                onPlaybackStable(currentActiveUrl)
+                if (exoPlayer.playbackState == Player.STATE_READY && exoPlayer.isPlaying) {
+                    Log.i("Preferred", "Reproducción estable detectada por timeout (15s) en URL: $currentActiveUrl")
+                    onPlaybackStable(currentActiveUrl)
+                } else {
+                    Log.i("Preferred", "Timeout 15s alcanzado pero el reproductor NO está en STATE_READY/isPlaying (state=${exoPlayer.playbackState}, isPlaying=${exoPlayer.isPlaying})")
+                }
             }
         }
 
-        // Esperar 8s para checkTracks
         delay(8000L)
         if (!isPlaybackError && !stableTimerReached) {
             val status = checkTracks(exoPlayer)
@@ -271,11 +272,16 @@ fun VideoPlayer(
                 }
                 TrackStatus.NO_AUDIO -> {
                     Log.i("TrackCheck", "Canal sin audio detectado (NO_AUDIO). Se mantiene reproduciendo.")
-                    onPlaybackStable(currentActiveUrl)
+                    if (exoPlayer.playbackState == Player.STATE_READY && exoPlayer.isPlaying) {
+                        onPlaybackStable(currentActiveUrl)
+                    }
                 }
                 TrackStatus.OK -> {
-                    Log.i("TrackCheck", "Pistas correctas (OK). Marcando playback estable.")
-                    onPlaybackStable(currentActiveUrl)
+                    Log.i("TrackCheck", "Pistas correctas (OK).")
+                    if (exoPlayer.playbackState == Player.STATE_READY && exoPlayer.isPlaying) {
+                        Log.i("TrackCheck", "Reproductor listo y reproduciendo. Marcando playback estable.")
+                        onPlaybackStable(currentActiveUrl)
+                    }
                 }
             }
         }
@@ -359,14 +365,11 @@ fun VideoPlayer(
                 Log.i("AudioDebug", "onAudioSessionIdChanged: audioSessionId=$audioSessionId")
             }
 
+            // Un solo Log.e unificado en onPlayerError y sin duplicados
             override fun onPlayerError(error: PlaybackException) {
-                Log.e("AudioDebug", "onPlayerError errorCode=${error.errorCode}, causeMessage=${error.cause?.message}", error)
-
                 val errorCodeName = getExoPlayerErrorName(error.errorCode)
-                Log.e("AudioDebug", "onPlayerError [Code: ${error.errorCode} - $errorCodeName]: ${error.localizedMessage}", error)
-
-                Log.e(TAG, "Error detectado en ExoPlayer: $errorCodeName", error)
                 val errorDescription = "[$errorCodeName] ${error.localizedMessage ?: "Error de reproducción"}"
+                Log.e("AudioDebug", "onPlayerError [Code: ${error.errorCode} - $errorCodeName], causeMessage=${error.cause?.message}: ${error.localizedMessage}", error)
 
                 if (error.errorCode == PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW) {
                     try {
@@ -831,7 +834,6 @@ private fun getExoPlayerErrorName(errorCode: Int): String {
         PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED -> "PARSING_CONTAINER_MALFORMED"
         PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED -> "PARSING_MANIFEST_MALFORMED"
         PlaybackException.ERROR_CODE_DECODING_FAILED -> "DECODING_FAILED"
-        PlaybackException.ERROR_CODE_DECODER_INIT_FAILED -> "DECODER_INIT_FAILED"
         PlaybackException.ERROR_CODE_DECODER_INIT_FAILED -> "DECODER_INIT_FAILED"
         PlaybackException.ERROR_CODE_AUDIO_TRACK_INIT_FAILED -> "AUDIO_TRACK_INIT_FAILED"
         PlaybackException.ERROR_CODE_AUDIO_TRACK_WRITE_FAILED -> "AUDIO_TRACK_WRITE_FAILED"
